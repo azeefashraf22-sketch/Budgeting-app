@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting App</title>
+    <!-- Font Awesome for Edit/Delete Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Top Cards Section -->
+        <div class="flex-row">
+            <!-- Budget Setting Card -->
+            <div class="card budget-card">
+                <h3>Budget</h3>
+                <input type="number" id="total-amount" placeholder="Enter Total Amount">
+                <button id="total-amount-button">Set Budget</button>
+            </div>
+
+            <!-- Expense Adding Card -->
+            <div class="card expense-card">
+                <h3>Expenses</h3>
+                <input type="text" id="product-title" placeholder="Enter Title of Product">
+                <input type="number" id="user-amount" placeholder="Enter Cost of Product">
+                <button id="check-amount">Check Amount</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Bar (Total, Expenses, Balance) -->
+        <div class="dashboard-bar">
+            <div class="dash-item">
+                <p>Total Budget</p>
+                <span id="amount">0</span>
+            </div>
+            <div class="dash-item">
+                <p>Expenses</p>
+                <span id="expenditure-value">0</span>
+            </div>
+            <div class="dash-item">
+                <p>Balance</p>
+                <span id="balance-amount">0</span>
+            </div>
+        </div>
+
+        <!-- Expense List Card -->
+        <div class="card list-card">
+            <h3>Expense List</h3>
+            <div id="list" class="expense-list-container">
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
