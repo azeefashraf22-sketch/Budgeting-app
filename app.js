@@ -1,4 +1,4 @@
-// --- ELEMENT SELECTION ---
+//  ELEMENT SELECTION 
 var totalAmountInput = document.getElementById("total-amount");
 var userAmountInput = document.getElementById("user-amount");
 var productTitleInput = document.getElementById("product-title");
@@ -11,7 +11,7 @@ var totalExpensesDisplay = document.getElementById("expenditure-value");
 var balanceDisplay = document.getElementById("balance-amount");
 var expenseList = document.getElementById("list");
 
-// --- BUDGET SETTING LOGIC ---
+//  BUDGET SETTING LOGIC
 totalBudgetBtn.onclick = function() {
     var budgetValue = totalAmountInput.value;
 
@@ -27,7 +27,7 @@ totalBudgetBtn.onclick = function() {
     }
 };
 
-// --- BALANCE CALCULATION LOGIC ---
+//  BALANCE CALCULATION LOGIC 
 function updateBalance() {
     var budget = parseInt(totalBudgetDisplay.innerText);
     var expenses = parseInt(totalExpensesDisplay.innerText);
@@ -35,7 +35,7 @@ function updateBalance() {
     balanceDisplay.innerText = currentBalance;
 }
 
-// --- ADDING EXPENSE LOGIC ---
+//  ADDING EXPENSE LOGIC 
 checkAmountBtn.onclick = function() {
     var title = productTitleInput.value;
     var amount = userAmountInput.value;
@@ -61,7 +61,7 @@ checkAmountBtn.onclick = function() {
     userAmountInput.value = "";
 };
 
-// --- CREATE LIST ITEM FUNCTION ---
+//  CREATE LIST ITEM FUNCTION 
 function createListItem(name, val) {
     var div = document.createElement("div");
     div.classList.add("list-item");
