@@ -1,110 +1,141 @@
-//  ELEMENT SELECTION 
-var totalAmountInput = document.getElementById("total-amount");
-var userAmountInput = document.getElementById("user-amount");
-var productTitleInput = document.getElementById("product-title");
+let totalAmount = document.getElementById("total-amount");
+let userAmount = document.getElementById("user-amount");
+const totalAmountButton = document.getElementById("total-amount-button");
+const checkAmountButton = document.getElementById("check-amount");
+const productTitle = document.getElementById("product-title");
+const amount = document.getElementById("amount");
+const expenditureValue = document.getElementById("expenditure-value");
+const balanceValue = document.getElementById("balance-amount");
+const list = document.getElementById("list");
+let tempAmount = 0;
 
-var totalBudgetBtn = document.getElementById("total-amount-button");
-var checkAmountBtn = document.getElementById("check-amount");
 
-var totalBudgetDisplay = document.getElementById("amount");
-var totalExpensesDisplay = document.getElementById("expenditure-value");
-var balanceDisplay = document.getElementById("balance-amount");
-var expenseList = document.getElementById("list");
+window.onload = () => {
+    tempAmount = localStorage.getItem("budget") || 0;
+    amount.innerText = tempAmount;
+    
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let totalExpenses = 0;
 
-//  BUDGET SETTING LOGIC
-totalBudgetBtn.onclick = function() {
-    var budgetValue = totalAmountInput.value;
+    expenses.forEach((expense) => {
+        totalExpenses += parseInt(expense.amount);
+        listCreator(expense.title, expense.amount, false); 
+    });
 
-    if (budgetValue == "" || budgetValue < 0) {
-        alert("Please enter a valid budget amount!");
+    expenditureValue.innerText = totalExpenses;
+    balanceValue.innerText = tempAmount - totalExpenses;
+};
+
+const saveExpenseLocal = (title, amount) => {
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    expenses.push({ title, amount });
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+};
+
+const removeExpenseLocal = (title, amount) => {
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let index = expenses.findIndex(exp => exp.title === title && exp.amount === amount);
+    if (index > -1) {
+        expenses.splice(index, 1);
+    }
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+};
+
+
+// Set Budget Function
+totalAmountButton.addEventListener("click", () => {
+    tempAmount = totalAmount.value;
+    if (tempAmount === "" || tempAmount < 0) {
+        alert("Value cannot be empty or negative");
     } else {
-        // Display budget on screen
-        totalBudgetDisplay.innerText = budgetValue;
-        // Update balance initially
-        updateBalance();
-        // Clear input
-        totalAmountInput.value = "";
+        amount.innerText = tempAmount;
+        balanceValue.innerText = tempAmount - expenditureValue.innerText;
+        // Save budget to local storage
+        localStorage.setItem("budget", tempAmount);
+        totalAmount.value = "";
     }
+});
+
+// Function to disable/enable edit and delete buttons
+const disableButtons = (bool) => {
+    let editButtons = document.getElementsByClassName("edit");
+    Array.from(editButtons).forEach((element) => {
+        element.disabled = bool;
+    });
 };
 
-//  BALANCE CALCULATION LOGIC 
-function updateBalance() {
-    var budget = parseInt(totalBudgetDisplay.innerText);
-    var expenses = parseInt(totalExpensesDisplay.innerText);
-    var currentBalance = budget - expenses;
-    balanceDisplay.innerText = currentBalance;
-}
+// Modify List Elements Function
+const modifyElement = (element, edit = false) => {
+    let parentDiv = element.parentElement.parentElement;
+    let currentBalance = balanceValue.innerText;
+    let currentExpense = expenditureValue.innerText;
+    let parentAmount = parentDiv.querySelector(".product-amount").innerText;
+    let parentText = parentDiv.querySelector(".product-name").innerText;
 
-//  ADDING EXPENSE LOGIC 
-checkAmountBtn.onclick = function() {
-    var title = productTitleInput.value;
-    var amount = userAmountInput.value;
-
-    if (title == "" || amount == "") {
-        alert("Please enter product name and cost!");
-        return;
+    if (edit) {
+        productTitle.value = parentText;
+        userAmount.value = parentAmount;
+        disableButtons(true);
     }
 
-    // 1. Update Total Expenses Display
-    var currentTotalExpenses = parseInt(totalExpensesDisplay.innerText);
-    var newTotalExpenses = currentTotalExpenses + parseInt(amount);
-    totalExpensesDisplay.innerText = newTotalExpenses;
-
-    // 2. Update Balance
-    updateBalance();
-
-    // 3. Add item to the list
-    createListItem(title, amount);
-
-    // 4. Clear inputs
-    productTitleInput.value = "";
-    userAmountInput.value = "";
+    balanceValue.innerText = parseInt(currentBalance) + parseInt(parentAmount);
+    expenditureValue.innerText = parseInt(currentExpense) - parseInt(parentAmount);
+    
+    removeExpenseLocal(parentText, parentAmount);
+    
+    parentDiv.remove();
 };
 
-//  CREATE LIST ITEM FUNCTION 
-function createListItem(name, val) {
-    var div = document.createElement("div");
-    div.classList.add("list-item");
-
-    div.innerHTML = `
+// Create List Function
+const listCreator = (expenseName, expenseValue, shouldSave = true) => {
+    let sublistContent = document.createElement("div");
+    sublistContent.classList.add("list-item");
+    sublistContent.innerHTML = `
         <div class="item-left">
             <div class="accent-line"></div>
-            <p class="product-name">${name}</p>
-            <p class="product-amount">${val}</p>
+            <p class="product-name">${expenseName}</p>
+            <p class="product-amount">${expenseValue}</p>
         </div>
         <div class="icons-wrapper">
-            <i class="fa-regular fa-pen-to-square edit-icon"></i>
-            <i class="fa-regular fa-trash-can delete-icon"></i>
+            <i class="fa-regular fa-pen-to-square edit" style="margin-right:8px"></i>
+            <i class="fa-regular fa-trash-can delete"></i>
         </div>
     `;
 
-    // DELETE LOGIC
-    var deleteBtn = div.querySelector(".delete-icon");
-    deleteBtn.onclick = function() {
-        // Reduce the expense value
-        var currentExpenses = parseInt(totalExpensesDisplay.innerText);
-        totalExpensesDisplay.innerText = currentExpenses - parseInt(val);
-        
-        // Update balance
-        updateBalance();
-        
-        // Remove item from UI
-        div.remove();
-    };
+    // Edit Button Logic
+    sublistContent.querySelector(".edit").addEventListener("click", (e) => {
+        modifyElement(e.target, true);
+    });
 
-    // EDIT LOGIC
-    var editBtn = div.querySelector(".edit-icon");
-    editBtn.onclick = function() {
-        // Fill inputs back with data
-        productTitleInput.value = name;
-        userAmountInput.value = val;
-        
-        // Remove current item (it will be added again after check amount)
-        var currentExpenses = parseInt(totalExpensesDisplay.innerText);
-        totalExpensesDisplay.innerText = currentExpenses - parseInt(val);
-        updateBalance();
-        div.remove();
-    };
+    // Delete Button Logic
+    sublistContent.querySelector(".delete").addEventListener("click", (e) => {
+        modifyElement(e.target);
+    });
 
-    expenseList.appendChild(div);
-}
+    list.appendChild(sublistContent);
+
+    if (shouldSave) {
+        saveExpenseLocal(expenseName, expenseValue);
+    }
+};
+
+// Add Expense Logic
+checkAmountButton.addEventListener("click", () => {
+    if (!userAmount.value || !productTitle.value) {
+        alert("Values cannot be empty");
+        return;
+    }
+
+    disableButtons(false);
+    let expenditure = parseInt(userAmount.value);
+    let sum = parseInt(expenditureValue.innerText) + expenditure;
+    expenditureValue.innerText = sum;
+
+    const totalBalance = tempAmount - sum;
+    balanceValue.innerText = totalBalance;
+
+    listCreator(productTitle.value, userAmount.value, true);
+    
+    productTitle.value = "";
+    userAmount.value = "";
+});
